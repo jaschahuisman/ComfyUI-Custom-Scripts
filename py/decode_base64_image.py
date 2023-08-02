@@ -13,7 +13,7 @@ class DecodeBase64Image:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "base64_encoded_image": ("STRING",),
+                "base64_encoded_image": ("STRING", {"multiline": True, "dynamicPrompts": False}),
             },
         }
 
