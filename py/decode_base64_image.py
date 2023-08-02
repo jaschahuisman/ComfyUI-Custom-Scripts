@@ -36,8 +36,8 @@ class DecodeBase64Image:
         # 2. Decode the base64 string into bytes.
         image_bytes = base64.b64decode(base64_encoded_image)
 
-        # 3. Convert the bytes into a PIL image.
-        image = Image.open(io.BytesIO(image_bytes))
+        # 3. Convert the bytes into a PIL image, standard as RGBA
+        image = Image.open(io.BytesIO(image_bytes)).convert('RGBA')
 
         # 4. Convert the PIL image into a numpy array.
         image = np.array(image).astype(np.float32) / 255.0
