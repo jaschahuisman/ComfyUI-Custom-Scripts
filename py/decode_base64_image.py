@@ -41,9 +41,9 @@ class DecodeBase64Image:
         image = np.array(image)
 
         # 5. Convert the numpy array into a PyTorch tensor.
-        result_image = torch.from_numpy(image).permute(2, 0, 1).float() / 255.0
+        result_image = torch.from_numpy(image)
 
-        return result_image
+        return (result_image,)
 
 NODE_CLASS_MAPPINGS = {
     "DecodeBase64Image": DecodeBase64Image,
