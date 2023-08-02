@@ -20,32 +20,30 @@ class DecodeBase64Image:
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "decode_base64_image"
     CATEGORY = "image"
-    OUTPUT_IS_LIST = (True,)
+    OUTPUT_IS_LIST = (False,)
 
     def decode_base64_image(self, base64_encoded_image):
         """
         Decodes a base64 string into a numpy image.
         """
-        results = []
-
-        # If the base64 string starts with "data:", remove the prefix,
-        # as we need only the raw base64 string.
+        # 1. Make sure to remove the prefix, if it exists.
+        # We only want the raw base64 string.
         if base64_encoded_image.startswith("data:"):
-            base64_encoded_image = base64_encoded_image.split(",")[-1]
+            base64_encoded_image = base64_encoded_image.split(",")[1]
 
-        # Decode the base64 string into an image
-        decoded_image = base64.b64decode(base64_encoded_image)
-        
-        image_bytes = io.BytesIO(decoded_image)
-        image = Image.open(image_bytes)
-        
-        # Convert the image to a torch tensor
-        result_image = np.array(image).astype(np.float32) / 255.0
-        result_image = torch.from_numpy(image)[None,]
+        # 2. Decode the base64 string into bytes.
+        image_bytes = base64.b64decode(base64_encoded_image)
 
-        results.append(result_image)
-                
-        return (results,)
+        # 3. Convert the bytes into a PIL image.
+        image = Image.open(io.BytesIO(image_bytes))
+
+        # 4. Convert the PIL image into a numpy array.
+        image = np.array(image)
+
+        # 5. Convert the numpy array into a PyTorch tensor.
+        result_image = torch.from_numpy(image).permute(2, 0, 1).float() / 255.0
+
+        return result_image
 
 NODE_CLASS_MAPPINGS = {
     "DecodeBase64Image": DecodeBase64Image,
