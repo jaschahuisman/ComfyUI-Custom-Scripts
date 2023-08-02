@@ -13,7 +13,7 @@ class DecodeBase64Image:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "base64_encoded_image": ("STRING", {"multiline": True, "dynamicPrompts": False}),
+                "base64_encoded_image": ("STRING", {"multiline": False, "dynamicPrompts": False}),
             },
         }
 
@@ -28,11 +28,20 @@ class DecodeBase64Image:
         """
         results = []
 
-        decoded_image = base64.b64decode(base64_encoded_image)
-        image = Image.open(io.BytesIO(decoded_image))
-        image = np.array(image)
+        # If the base64 string starts with "data:", remove the prefix,
+        # as we need only the raw base64 string.
+        if base64_encoded_image.startswith("data:"):
+            base64_encoded_image = base64_encoded_image.split(",")[-1]
 
-        results.append(image)
+        # Decode the base64 string into an image
+        decoded_image = base64.b64decode(base64_encoded_image)
+        
+        image_bytes = io.BytesIO(decoded_image)
+        image = Image.open(image_bytes)
+        
+        np_image = np.array(image)
+
+        results.append(np_image)
                 
         return (results,)
 
