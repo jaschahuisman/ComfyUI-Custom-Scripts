@@ -39,8 +39,9 @@ class DecodeBase64Image:
         image_bytes = io.BytesIO(decoded_image)
         image = Image.open(image_bytes)
         
-        result_image = np.array(image)
-        result_image = torch.from_numpy(result_image)[None,]
+        # Convert the image to a torch tensor
+        result_image = np.array(image).astype(np.float32) / 255.0
+        result_image = torch.from_numpy(image)[None,]
 
         results.append(result_image)
                 
