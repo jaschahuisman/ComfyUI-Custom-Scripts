@@ -20,12 +20,14 @@ class DecodeBase64Image:
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "decode_base64_image"
     CATEGORY = "image"
-    OUTPUT_IS_LIST = (False,)
+    OUTPUT_IS_LIST = (True,)
 
     def decode_base64_image(self, base64_encoded_image):
         """
         Decodes a base64 string into a numpy image.
         """
+        results = []
+
         # 1. Make sure to remove the prefix, if it exists.
         # We only want the raw base64 string.
         if base64_encoded_image.startswith("data:"):
@@ -38,12 +40,14 @@ class DecodeBase64Image:
         image = Image.open(io.BytesIO(image_bytes))
 
         # 4. Convert the PIL image into a numpy array.
-        image = np.array(image)
+        image = np.array(image).astype(np.float32) / 255.0
 
         # 5. Convert the numpy array into a PyTorch tensor.
-        result_image = torch.from_numpy(image)
+        result_image = torch.from_numpy(image)[None,]
 
-        return (result_image,)
+        results.append(result_image)
+
+        return (results,)
 
 NODE_CLASS_MAPPINGS = {
     "DecodeBase64Image": DecodeBase64Image,
